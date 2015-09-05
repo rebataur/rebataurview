@@ -1,0 +1,12 @@
+{
+  "Database" : {
+    "DBType" : "pg",
+    "Path" : "D:\\Program Files\\PostgreSQLPortable-9.4\\App\\PgSQL"
+  },
+  "Repository" :{
+    "Path" : "D:\\repository"
+  },
+  "InputFile" : {
+    "FileType" : "CSV"
+  }
+}
