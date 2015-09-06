@@ -1,4 +1,4 @@
-package cmdimplementors
+package cmdimpl
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func startPG(command string) {
+func StartPG(command string) {
 	log.Println("starting up")
 	go func() {
 			out, err := exec.Command("D:\\Program Files\\PostgreSQLPortable-9.4\\App\\PgSQL\\bin\\pg_ctl", "start", "-D", "D:\\Program Files\\PostgreSQLPortable-9.4\\Data\\data").Output()

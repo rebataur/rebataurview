@@ -1,4 +1,4 @@
-package cmdimplementors
+package cmdimpl
 
 import (
 	"encoding/csv"

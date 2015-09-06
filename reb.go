@@ -3,6 +3,7 @@ import(
     "github.com/spf13/cobra"
     "fmt"
     "strings"
+    "github.com/ranjanprj/rebataurview/cmdimpl"
 
 
 )
@@ -13,6 +14,7 @@ import(
 func main() {
 
 
+    cmdimpl.StartPG("test")
 
     var cmdInitPG = &cobra.Command{
         Use:   "initpg",
