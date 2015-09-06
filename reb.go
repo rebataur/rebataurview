@@ -8,12 +8,7 @@ import(
 
 )
 
-
-
-
 func main() {
-
-
     cmdimpl.StartPG("test")
 
     var cmdInitPG = &cobra.Command{
