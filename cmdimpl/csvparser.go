@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"path/filepath"
 )
 import (
 	"database/sql"
@@ -19,11 +20,46 @@ type ColumnType struct {
 	dbType string
 }
 
-// func main() {
-// 	ReadRepositoryFile("rep", "D:\\uploads\\4.csv")
-// 	fmt.Println("========DONE==========")
-// }
+func FindColumnNameAndType(filePath string) (string,[]string,[]string,error) {
+	log.Println("Reading repository file")
+	_,fileName := filepath.Split(filePath)
+	repositoryName := strings.Split(fileName,".csv")[0]
+	file, err := os.Open(filePath)
 
+	if err != nil {
+
+		log.Fatal(err)
+		return "",nil,nil,err
+	}
+
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	reader.FieldsPerRecord = -1
+
+	rawCSVDat, err := reader.ReadAll()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var columns []string
+	// var dbCols []ColumnType
+	var dbColsType string
+	for i, each := range rawCSVDat {
+
+		if i == 0 {
+			columns = createTabel(each)
+		} else if i == 1 {
+			// figure out data types and create table
+			dbColsType,_ = getCreateTableQuery(columns, each)
+		}
+	}
+
+
+	log.Println("Finished Processing data")
+	return repositoryName,columns,strings.Split(dbColsType,","),nil
+}
 func ReadRepositoryFile(fileName, filePath string) []string {
 	log.Println("Reading repository file")
 	repositoryName := strings.Split(fileName,".csv")[0]
