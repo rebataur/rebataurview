@@ -13,7 +13,13 @@ func TestCSVMetaParser(t *testing.T) {
 }
 
 func TestGetTableMetaData(t *testing.T){
-	log.Println(string(getTableMetadata("cc")))
-	log.Println(string(getColumnMetadata("cc")))
-	log.Println(string(getColumnFrequency("state","cc",10)))
+	// log.Println(string(getTableMetadata("cc")))
+	// log.Println(string(getColumnMetadata("cc")))
+	res,err := getColumnFrequency("zip_code","cc","10")
+	if err == nil{
+		log.Println("here are the result :" ,string(res))
+	}else{
+		log.Println("There was an error",err)
+	}
+
 }

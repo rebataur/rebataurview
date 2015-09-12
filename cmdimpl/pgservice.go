@@ -158,10 +158,13 @@ func queryStmt(queryStmt string) []byte {
 		db = getDB()
 	}
 	var result []byte
-	db.QueryRow(getJSONQuery(queryStmt)).Scan(&result)
+	err := db.QueryRow(getJSONQuery(queryStmt)).Scan(&result)
 
 	//rows, _ := db.Query(queryStmt)
 	//printRows(rows)
+	if err != nil{
+		result = []byte("there was an error executing query")
+	}
 	return result
 
 }
