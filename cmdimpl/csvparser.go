@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
-	"path/filepath"
 )
 import (
 	"database/sql"
@@ -20,16 +20,16 @@ type ColumnType struct {
 	dbType string
 }
 
-func FindColumnNameAndType(filePath string) (string,[]string,[]string,error) {
+func FindColumnNameAndType(filePath string) (string, []string, []string, error) {
 	log.Println("Reading repository file")
-	_,fileName := filepath.Split(filePath)
-	repositoryName := strings.Split(fileName,".csv")[0]
+	_, fileName := filepath.Split(filePath)
+	repositoryName := strings.Split(fileName, ".csv")[0]
 	file, err := os.Open(filePath)
 
 	if err != nil {
 
 		log.Fatal(err)
-		return "",nil,nil,err
+		return "", nil, nil, err
 	}
 
 	defer file.Close()
@@ -52,17 +52,16 @@ func FindColumnNameAndType(filePath string) (string,[]string,[]string,error) {
 			columns = createTabel(each)
 		} else if i == 1 {
 			// figure out data types and create table
-			dbColsType,_ = getCreateTableQuery(columns, each)
+			dbColsType, _ = getCreateTableQuery(columns, each)
 		}
 	}
 
-
 	log.Println("Finished Processing data")
-	return repositoryName,columns,strings.Split(dbColsType,","),nil
+	return repositoryName, columns, strings.Split(dbColsType, ","), nil
 }
 func ReadRepositoryFile(fileName, filePath string) []string {
 	log.Println("Reading repository file")
-	repositoryName := strings.Split(fileName,".csv")[0]
+	repositoryName := strings.Split(fileName, ".csv")[0]
 	file, err := os.Open(filePath)
 
 	if err != nil {
@@ -95,7 +94,7 @@ func ReadRepositoryFile(fileName, filePath string) []string {
 		}
 	}
 
-	log.Println("inserting data");
+	log.Println("inserting data")
 	for i, each := range rawCSVDat {
 		if i > 0 {
 
@@ -201,19 +200,18 @@ func createTable(tableName, columns string) {
 	dropTableSQL := fmt.Sprintf("DROP TABLE IF  EXISTS %s; \n", tableName)
 	createTableSQL := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s ( %s ); \n ", tableName, columns)
 
-		// file, err := os.OpenFile("D:\\uploads\\insert.sql", os.O_APPEND|os.O_WRONLY, 0600)
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// defer file.Close()
-		//
-		// if _, err = file.WriteString(createTableSQL); err != nil {
-		// 	panic(err)
-		// }
-  // dbCreateTable("set datestyle = DMY;")
+	// file, err := os.OpenFile("D:\\uploads\\insert.sql", os.O_APPEND|os.O_WRONLY, 0600)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer file.Close()
+	//
+	// if _, err = file.WriteString(createTableSQL); err != nil {
+	// 	panic(err)
+	// }
+	// dbCreateTable("set datestyle = DMY;")
 	dbCreateTable(dropTableSQL)
 	dbCreateTable(createTableSQL)
-
 
 }
 
@@ -222,7 +220,7 @@ func insertData(tableName string, dbCols []ColumnType, dataRow []string) {
 	dbData := make([]string, len(dbCols))
 	for i, each := range dataRow {
 		escEach := strings.Replace(each, "'", "''", -1)
-		if len(each) == 0 || len(strings.TrimSpace(each)) == 0  {
+		if len(each) == 0 || len(strings.TrimSpace(each)) == 0 {
 			dbData[i] = "NULL"
 		} else if dbCols[i].dbType == "percentage" {
 			dbData[i] = strings.Replace(escEach, "%", "", -1)
@@ -244,15 +242,15 @@ func insertData(tableName string, dbCols []ColumnType, dataRow []string) {
 
 	// open files r and w
 
-		// file, err := os.OpenFile("D:\\uploads\\insert.sql", os.O_APPEND|os.O_WRONLY, 0600)
-		// if err != nil {
-		// 	panic(err)
-		// }
-		// defer file.Close()
-		//
-		// if _, err = file.WriteString(insertTableSQL); err != nil {
-		// 	panic(err)
-		// }
+	// file, err := os.OpenFile("D:\\uploads\\insert.sql", os.O_APPEND|os.O_WRONLY, 0600)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer file.Close()
+	//
+	// if _, err = file.WriteString(insertTableSQL); err != nil {
+	// 	panic(err)
+	// }
 
 	dbInsertData(insertTableSQL)
 
@@ -261,8 +259,9 @@ func insertData(tableName string, dbCols []ColumnType, dataRow []string) {
 var ddMMStr, mmDDStr string
 var mmDD, ddMM, genericDate *regexp.Regexp
 var ismmDD bool = false
+
 func dateCorrectionToDDMMYY(dateInString string) string {
-	dateInString = strings.Split(dateInString," ")[0]
+	dateInString = strings.Split(dateInString, " ")[0]
 	if len(ddMMStr) == 0 {
 
 		ddMMStr = `(((0[1-9]|[12][0-9]|3[01])([/])(0[13578]|10|12)([/])(\d{4}))|(([0][1-9]|[12][0-9]|30)([/])(0[469]|11)([/])(\d{4}))|((0[1-9]|1[0-9]|2[0-8])([/])(02)([/])(\d{4}))|((29)(\.|-|\/)(02)([/])([02468][048]00))|((29)([/])(02)([/])([13579][26]00))|((29)([/])(02)([/])([0-9][0-9][0][48]))|((29)([/])(02)([/])([0-9][0-9][2468][048]))|((29)([/])(02)([/])([0-9][0-9][13579][26])))`
@@ -300,8 +299,8 @@ func dateCorrectionToDDMMYY(dateInString string) string {
 			return strings.Replace(inDDMMFormat, "/", "-", -1)
 		}
 
-	}else if genericDate.MatchString(dateInString) {
-			// TODO This needs to be looked into
+	} else if genericDate.MatchString(dateInString) {
+		// TODO This needs to be looked into
 		dateStr1 := strings.Split(dateInString, "-")
 		dateStr2 := strings.Split(dateInString, "/")
 		dateStr3 := strings.Split(dateInString, "\\")
@@ -368,18 +367,20 @@ func dbCreateTable(createTableSql string) {
 		log.Fatal(err)
 	}
 }
-const(
 
-		size = 5
-	)
+const (
+	size = 5
+)
+
 var insertDatArr [size]string
 
 var cnt int = 0
 var cnt1 int = 0
+
 func dbInsertData(insertStmts string) {
 
-	if(db==nil){
-		db= getDB()
+	if db == nil {
+		db = getDB()
 	}
 
 	db.Exec(insertStmts)

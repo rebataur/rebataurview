@@ -8,5 +8,8 @@
   },
   "InputFile" : {
     "FileType" : "CSV"
+  },
+  "NW" : {
+    "NWPath" :"C:\\Users\\pranjan\\Downloads\\nw\\"
   }
 }

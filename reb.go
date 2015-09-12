@@ -2,28 +2,45 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"strings"
-	// "github.com/ranjanprj/rebataurview/cmdimpl"
-
+	"net/http"
+	"log"
 )
 
-func main() {
+var nwPath string
 
-	var cmdInitPG = &cobra.Command{
-		Use:   "initpg",
-		Short: "Initialize Postgresql",
-		Long: `This will create if not exist, a database in the provided repository path,
-        and initialize and start Postgres database.
-        `,
-		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Print: " + strings.Join(args, " "))
-		},
+func main() {
+	http.HandleFunc("/", homeHandler)
+	http.HandleFunc("/cmd",cmdHandler)
+	http.Handle("/rebapp/", http.FileServer(http.Dir(nwPath)))
+	http.ListenAndServe(":9999", nil)
+
+}
+func homeHandler(w http.ResponseWriter, r *http.Request){
+	// fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+	fmt.Fprintf(w, "Hi there, I love %s!", "hahah")
+
+	// executeCommand("initpg D:\\uploads\\cc.csv")
+
+}
+func cmdHandler(w http.ResponseWriter, r *http.Request){
+	cmd := r.FormValue("cmd")
+	executeCommand(cmd)
+	fmt.Fprintf(w, "%s", result )
+
+}
+
+func executeCommand(cmd string) {
+	rootCmd.SetArgs(strings.Split(cmd," "))
+	rootCmd.Execute()
+}
+
+func init(){
+	config,err := getConfig()
+	if err == nil{
+		nwPath = config.NW.NWPath
+	}else{
+		log.Fatal("Error getting NW Path")
 	}
 
-	// cmdTimes.Flags().IntVarP(&echoTimes, "times", "t", 1, "times to echo the input")
-
-	var rootCmd = &cobra.Command{Use: "reb"}
-	rootCmd.AddCommand(cmdInitPG)
-	rootCmd.Execute()
 }

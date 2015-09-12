@@ -1,11 +1,10 @@
 package utilities
 
-import(
-  "log"
-  "testing"
+import (
+	"log"
+	"testing"
 )
 
+func TestReadConfig(t *testing.T) {
 
-func TestReadConfig(t *testing.T){
-  
 }
