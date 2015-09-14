@@ -20,7 +20,6 @@ func dbStarted() bool {
 		return true
 	}
 	return false
-
 }
 func StartPG(dbPath string) {
 	log.Println("starting up")
@@ -54,7 +53,30 @@ func StopPG(dbPath string) {
 
 	time.Sleep(10 * time.Second)
 }
+func SetupDB(){
+	if db == nil {
+		db = getDB()
+	}
+	db.QueryRow(`CREATE TABLE TABLE_METADATA(
+	id bigserial primary key not null ,
+	table_name varchar unique not null,
+	table_desc varchar,
+	table_origin varchar,
+	creation_date date
 
+	)`)
+
+	db.QueryRow(`create table columns_metadata(
+	id bigserial primary key not null,
+	column_name varchar,
+	ordinal_position int,
+	data_type varchar,
+	dimension boolean default false,
+	measure boolean default false,
+	owning_table bigserial REFERENCES table_metadata(id)
+)`)
+
+}
 func PGCopyCmd(tableName string, filePath string) {
 	if db == nil {
 		db = getDB()

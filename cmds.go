@@ -27,7 +27,7 @@ var cmdDescribeTable = &cobra.Command{
   Long: `This describes table`,
   Run: func(cmd *cobra.Command, args []string) {
     mutex.Lock()
-    result = describeTable(args[0])
+    result = describeTable()
     mutex.Unlock()
   },
 }

@@ -25,6 +25,7 @@ func init() {
 
 		// Start the DB
 		cmdimpl.StartPG(config.Database.DBPath)
+		cmdimpl.SetupDB()
 		// Start the Node Window
 		startNW(config.NW.NWPath)
 		initialized = true
@@ -74,8 +75,8 @@ func loadDataIntoPG(filePath string, directCopy bool) {
 
 
 }
-func describeTable(tableName string) []byte{
-	return cmdimpl.GetMetaData("table_schema",tableName)
+func describeTable() []byte{
+	return cmdimpl.GetMetaData("table_schema","")
 }
 func describeColumns(tableName string) []byte{
 	return cmdimpl.GetMetaData("columns_schema",tableName)

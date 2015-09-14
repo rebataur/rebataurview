@@ -12,7 +12,7 @@ var nwPath string
 func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/cmd",cmdHandler)
-	http.Handle("/rebapp/", http.FileServer(http.Dir(nwPath)))
+	http.Handle("/app/", http.FileServer(http.Dir(nwPath)))
 	http.ListenAndServe(":9999", nil)
 
 }
