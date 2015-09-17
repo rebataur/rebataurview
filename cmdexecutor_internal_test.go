@@ -1,8 +1,8 @@
 package main
 
 import (
-	"testing"
 	"log"
+	"testing"
 	// "strings"
 )
 
@@ -13,14 +13,14 @@ func TestCSVMetaParser(t *testing.T) {
 	loadDataIntoPG("D:\\uploads\\Consumer_Complaints.csv", true)
 }
 
-func TestGetTableMetaData(t *testing.T){
+func TestGetTableMetaData(t *testing.T) {
 	// log.Println(string(getTableMetadata("cc")))
 	// log.Println(string(getColumnMetadata("cc")))
-	res,err := getColumnFrequency("zip_code","minicc","10")
-	if err == nil{
-		log.Println("here are the result :" ,string(res))
-	}else{
-		log.Println("There was an error",err)
+	res, err := getColumnFrequency("zip_code", "minicc", "10")
+	if err == nil {
+		log.Println("here are the result :", string(res))
+	} else {
+		log.Println("There was an error", err)
 	}
 
 }

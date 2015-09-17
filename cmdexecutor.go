@@ -3,14 +3,16 @@ package main
 import (
 	"log"
 	"os/exec"
-	"strings"
 	"strconv"
+	"strings"
 )
+
 
 import (
 	cmdimpl "github.com/ranjanprj/rebataurview/cmdimpl"
 	utils "github.com/ranjanprj/rebataurview/utilities"
 )
+
 var initialized bool
 var config utils.Config
 
@@ -21,7 +23,6 @@ func init() {
 		if err != nil {
 			log.Fatal("Could not read config.json, check whether it's there")
 		}
-		log.Println(config.Database.DBPath)
 
 		// Start the DB
 		cmdimpl.StartPG(config.Database.DBPath)
@@ -40,21 +41,21 @@ func cleanup() {
 	}
 
 }
-func getConfig() (utils.Config,error){
+func getConfig() (utils.Config, error) {
 	return utils.ReadConfig()
 
 }
-func startNW(path string){
-	go func(){
-		fullPath := strings.Join([]string{path,"nw.exe"},"")
-		appPath  := strings.Join([]string{path,"\\rebapp"},"")
-		out, err := exec.Command(fullPath,appPath).Output()
+func startNW(path string) {
+	go func() {
+		fullPath := strings.Join([]string{path, "nw.exe"}, "")
+		appPath := strings.Join([]string{path, "\\rebapp"}, "")
+		out, err := exec.Command(fullPath, appPath).Output()
 		if err != nil {
 			log.Fatal(err)
 		}
 		log.Println(out)
 
-		}();
+	}()
 }
 func loadDataIntoPG(filePath string, directCopy bool) {
 	// Read the CSV metadata
@@ -77,13 +78,13 @@ func loadDataIntoPG(filePath string, directCopy bool) {
 	cmdimpl.CreateTableMetaData(tableName)
 
 }
-func describeTable() []byte{
-	return cmdimpl.GetMetaData("table_schema","")
+func describeTable() []byte {
+	return cmdimpl.GetMetaData("table_schema", "")
 }
-func describeColumns(tableName string) []byte{
-	return cmdimpl.GetMetaData("columns_schema",tableName)
+func describeColumns(tableName string) []byte {
+	return cmdimpl.GetMetaData("columns_schema", tableName)
 }
-func getColumnFrequency(columnName string, tableName string, limit string) ([]byte,error){
-	l,err := strconv.Atoi(limit)
-	return cmdimpl.GetFrequencyCount(columnName, tableName, l),err
+func getColumnFrequency(columnName string, tableName string, limit string) ([]byte, error) {
+	l, err := strconv.Atoi(limit)
+	return cmdimpl.GetFrequencyCount(columnName, tableName, l), err
 }

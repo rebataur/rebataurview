@@ -9,12 +9,11 @@ func GetFrequencyCount(colName string, tableName string, limit int) []byte {
 	return queryStmt(query)
 }
 
-func AnalyzeTable(tableName string){
+func AnalyzeTable(tableName string) {
 	// query := fmt.Sprintf(`select column_name,ordinal_position,data_type,numeric_precision  from information_schema.columns
 	// 	where table_name = '%s'`,tableName)
 
-
 }
-func GetDimensionsAndMeasures(tableName string){
+func GetDimensionsAndMeasures(tableName string) {
 
 }
