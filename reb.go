@@ -30,10 +30,16 @@ func cmdHandler(w http.ResponseWriter, r *http.Request){
 
 }
 
+
+
+
 func executeCommand(cmd string) {
 	rootCmd.SetArgs(strings.Split(cmd," "))
 	rootCmd.Execute()
 }
+
+
+
 
 func init(){
 	config,err := getConfig()

@@ -73,6 +73,8 @@ func loadDataIntoPG(filePath string, directCopy bool) {
 		cmdimpl.PGCopyCmd(tableName, filePath)
 	}
 
+	// Create table metadata
+	cmdimpl.CreateTableMetaData(tableName)
 
 }
 func describeTable() []byte{

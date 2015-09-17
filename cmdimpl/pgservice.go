@@ -62,7 +62,7 @@ func SetupDB(){
 	table_name varchar unique not null,
 	table_desc varchar,
 	table_origin varchar,
-	creation_date date
+	creation_date date not null default CURRENT_DATE
 
 	)`)
 
@@ -71,12 +71,13 @@ func SetupDB(){
 	column_name varchar,
 	ordinal_position int,
 	data_type varchar,
-	dimension boolean default false,
 	measure boolean default false,
 	owning_table bigserial REFERENCES table_metadata(id)
 )`)
-
+db.QueryRow(`create extension pg_trgm`)
+db.QueryRow(`CREATE INDEX trgm_idx ON columns_metadata USING gist (column_name gist_trgm_ops)`)
 }
+
 func PGCopyCmd(tableName string, filePath string) {
 	if db == nil {
 		db = getDB()
@@ -155,7 +156,95 @@ func GetMetaData(mdType, mdVal string) []byte {
 	db.QueryRow(query).Scan(&result)
 	return result
 }
+// Create table metadata from the imported table
+type tableMetaData struct{
+	column_name string
+	ordinal_position int
+	data_type string
+	dimension bool
+	measure bool
+	owning_table int
+}
 
+
+func CreateTableMetaData(tableName string){
+	if db == nil {
+		db = getDB()
+	}
+
+	// Insert into Table metadata
+	var id int
+	q := fmt.Sprintf(`select id from table_metadata where table_name = '%s'`,tableName)
+	db.QueryRow(q).Scan(&id)
+	log.Println("-----",id)
+	if id > 0{
+		s := fmt.Sprintf(`delete from columns_metadata where owning_table = %d`,id)
+		execPrepareStmt(s)
+		s = fmt.Sprintf(`delete from table_metadata where table_name = '%s'`,tableName)
+		execPrepareStmt(s)
+
+	}
+	insertStmt := fmt.Sprintf(`insert into table_metadata (table_name,table_desc,table_origin) values ('%s','%s','%s') RETURNING id`,tableName,tableName,tableName)
+	err := db.QueryRow(insertStmt).Scan(&id)
+	log.Println(id)
+	// select the PG table to get metadata
+	queryStmt := fmt.Sprintf(`select column_name,ordinal_position,data_type  from information_schema.columns
+	where table_name = '%s'	`,tableName)
+
+	rows,err := db.Query(queryStmt)
+
+	if err != nil{
+			log.Fatal("Error occured while create table metadata")
+	}
+
+	for rows.Next(){
+		tblMeta := new(tableMetaData)
+		 err := rows.Scan(&tblMeta.column_name,&tblMeta.ordinal_position,&tblMeta.data_type)
+		 if err == nil{
+
+			 log.Println(tblMeta.column_name)
+			 var isMeasure bool = findIfColumnIsMeasure(tblMeta, tableName)
+			//  insertStmtColums := fmt.Sprintf(,tableName,tableName,tableName)
+			insertStmtCol := fmt.Sprintf(`insert into columns_metadata
+			(column_name,ordinal_position,data_type,measure,owning_table)
+			 values ('%s',%d,'%s',%t,%d)`, tblMeta.column_name,tblMeta.ordinal_position,tblMeta.data_type,isMeasure,id)
+			 err := db.QueryRow(insertStmtCol)
+			 if err != nil{
+				 log.Println(err)
+			 }
+
+		 }else{
+			 log.Println("Error parsing tbl meta",err)
+		 }
+	 	}
+}
+
+// Find whether column is a measure
+func findIfColumnIsMeasure(tblMeta *tableMetaData, tableName string) bool{
+	var isMeasure bool
+	switch tblMeta.data_type{
+		case "numeric":
+			isMeasure = true
+			break;
+		case "bigint":
+			lowerCol :=  strings.ToLower(tblMeta.column_name)
+			if strings.Contains(lowerCol,"id"){
+					isMeasure = false
+			}else{
+				  isMeasure = true
+			}
+			break;
+		case "character varying":
+			  isMeasure = false
+				break
+		case "date":
+			  isMeasure = false
+				break
+		default :
+			  isMeasure = false
+	}
+	return isMeasure
+}
 // Execute a prepared statement
 func execPrepareStmt(prepStmt string) {
 	if db == nil {
@@ -190,7 +279,6 @@ func queryStmt(queryStmt string) []byte {
 	return result
 
 }
-
 func getJSONQuery(queryStmt string) string {
 	jsonQuery := fmt.Sprintf("	select array_to_json(array_agg(row_to_json(t))) as result	from ( %s ) t ;", queryStmt)
 	return jsonQuery
