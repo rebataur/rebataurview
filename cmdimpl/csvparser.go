@@ -175,7 +175,10 @@ func getCreateTableQuery(columns, colVal []string) (string, []ColumnType) {
 		} else if pctMatches.MatchString(each) {
 			dbCols[i].name = each
 			dbCols[i].dbType = "percentage"
-		} else {
+		}else if isCurr,val := isCurrency(each);isCurr==true{
+			dbCols[i].name = val
+			dbCols[i].dbType = "decimal"
+		}else {
 			dbCols[i].name = each
 			dbCols[i].dbType = "varchar"
 		}
@@ -418,4 +421,130 @@ func getDB() *sql.DB {
 	// Connect to db
 	db, _ = sql.Open("postgres", "user=postgres dbname=postgres sslmode=disable")
 	return db
+}
+func isCurrency(fieldValue string) (bool, string) {
+	for _, each := range currencySymbols {
+		if strings.HasPrefix(fieldValue, each) {
+			return true, strings.Split(fieldValue, each)[1]
+		}
+	}
+	return false, ""
+}
+
+var currencySymbols = []string{
+	"Lek",
+	"?",
+	"$",
+	"ƒ",
+	"$",
+	"???",
+	"$",
+	"$",
+	"p.",
+	"BZ$",
+	"$",
+	"$b",
+	"KM",
+	"P",
+	"??",
+	"R$",
+	"$",
+	"?",
+	"$",
+	"$",
+	"$",
+	"¥",
+	"$",
+	"¢",
+	"kn",
+	"?",
+	"Kc",
+	"kr",
+	"RD$",
+	"$",
+	"£",
+	"$",
+	"kr",
+	"€",
+	"£",
+	"$",
+	"¢",
+	"£",
+	"Q",
+	"£",
+	"$",
+	"L",
+	"$",
+	"Ft",
+	"kr",
+	"₹",
+	"Rp",
+	"?",
+	"£",
+	"?",
+	"J$",
+	"¥",
+	"£",
+	"??",
+	"?",
+	"?",
+	"??",
+	"?",
+	"Ls",
+	"£",
+	"$",
+	"Lt",
+	"???",
+	"RM",
+	"?",
+	"$",
+	"?",
+	"MT",
+	"$",
+	"?",
+	"ƒ",
+	"$",
+	"C$",
+	"?",
+	"?",
+	"kr",
+	"?",
+	"?",
+	"B/.",
+	"Gs",
+	"S/.",
+	"?",
+	"zl",
+	"?",
+	"lei",
+	"???",
+	"£",
+	"?",
+	"???.",
+	"?",
+	"$",
+	"$",
+	"S",
+	"R",
+	"?",
+	"?",
+	"kr",
+	"CHF",
+	"$",
+	"£",
+	"NT$",
+	"?",
+	"TT$",
+	"",
+	"£",
+	"$",
+	"?",
+	"£",
+	"$",
+	"$U",
+	"??",
+	"Bs",
+	"?",
+	"?",
+	"Z$",
 }

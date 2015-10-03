@@ -3,10 +3,8 @@ package main
 import (
 	"log"
 	"os/exec"
-	"strconv"
 	"strings"
 )
-
 
 import (
 	cmdimpl "github.com/ranjanprj/rebataurview/cmdimpl"
@@ -84,7 +82,6 @@ func describeTable() []byte {
 func describeColumns(tableName string) []byte {
 	return cmdimpl.GetMetaData("columns_schema", tableName)
 }
-func getColumnFrequency(columnName string, tableName string, limit string) ([]byte, error) {
-	l, err := strconv.Atoi(limit)
-	return cmdimpl.GetFrequencyCount(columnName, tableName, l), err
+func doAnalytics(clmn, tbln, fn string, limit int, args []string) ([]byte, error) {
+	return cmdimpl.DoAnalytics(clmn, tbln, fn, limit, args)
 }

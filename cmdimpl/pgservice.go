@@ -10,22 +10,32 @@ import (
 )
 
 func dbStarted() bool {
+
 	if db == nil {
 		db = getDB()
 	}
-	var result []byte
-	db.QueryRow("SELECT 2*3").Scan(&result)
 
-	if len(result) == 1 {
+	// var result []byte
+	// db.QueryRow("SELECT 2*3").Scan(&result)
+	//
+	// if len(result) == 1 {
+	// 	return true
+	// }
+	// return false
+
+	err := db.Ping()
+
+	if err != nil {
+		return false
+	} else {
 		return true
 	}
-	return false
 }
 func StartPG(dbPath string) {
 	log.Println("starting up")
 	if dbStarted() == false {
 		go func() {
-			out, err := exec.Command(strings.Join([]string{dbPath, "\\bin\\pg_ctl"}, ""), "start", "-D", "D:\\Program Files\\PostgreSQLPortable-9.4\\Data\\data").Output()
+			out, err := exec.Command(strings.Join([]string{dbPath, "App\\PgSQL\\bin\\pg_ctl"}, ""), "start", "-D", strings.Join([]string{dbPath, "Data\\data"}, "")).Output()
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -44,7 +54,7 @@ func StopPG(dbPath string) {
 
 	fmt.Println("Cleaning up")
 	go func() {
-		out, err := exec.Command(strings.Join([]string{dbPath, "\\bin\\pg_ctl"}, ""), "stop", "-D", "D:\\Program Files\\PostgreSQLPortable-9.4\\Data\\data", "-W", "-m", "immediate").Output()
+		out, err := exec.Command(strings.Join([]string{dbPath, "App\\PgSQL\\bin\\pg_ctl"}, ""), "stop", "-D", strings.Join([]string{dbPath, "Data\\data"}, ""), "-W", "-m", "immediate").Output()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -216,10 +226,15 @@ func CreateTableMetaData(tableName string) {
 func findIfColumnIsMeasure(tblMeta *tableMetaData, tableName string) bool {
 	switch tblMeta.data_type {
 	case "numeric":
-		return true
+		lowerCol := strings.ToLower(tblMeta.column_name)
+		if columnInDimension(lowerCol) {
+			return false
+		} else {
+			return true
+		}
 	case "bigint":
 		lowerCol := strings.ToLower(tblMeta.column_name)
-		if strings.Contains(lowerCol, "id") {
+		if columnInDimension(lowerCol) {
 			return false
 		} else {
 			return true
@@ -231,6 +246,17 @@ func findIfColumnIsMeasure(tblMeta *tableMetaData, tableName string) bool {
 	default:
 		return false
 	}
+}
+
+func columnInDimension(colname string) bool {
+	dimColname := [...]string{"id", "zip", "loc", "number", "year", "day", "date", "time"}
+	for _, each := range dimColname {
+		if strings.Contains(colname, each) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Execute a prepared statement

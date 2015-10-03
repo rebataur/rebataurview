@@ -10,7 +10,8 @@ import (
 
 var result []byte
 var mutex = &sync.Mutex{}
-
+var fn, clmn, tbln string
+var limit int
 var rootCmd = &cobra.Command{Use: "rebataurview"}
 var cmdInitPG = &cobra.Command{
 	Use:   "initpg",
@@ -43,13 +44,13 @@ var cmdDescribeColumns = &cobra.Command{
 		mutex.Unlock()
 	},
 }
-var cmdFrequencyCount = &cobra.Command{
-	Use:   "freq",
-	Short: "Frequency count",
-	Long:  `This gets frequency count of column of table`,
+var cmdAnalyze = &cobra.Command{
+	Use:   "analyze",
+	Short: "Analyze",
+	Long:  `This is the mother analytics command`,
 	Run: func(cmd *cobra.Command, args []string) {
 		mutex.Lock()
-		res, err := getColumnFrequency(args[0], args[1], args[2])
+		res, err := doAnalytics(clmn, tbln, fn, limit, args)
 		if err != nil {
 			result = []byte("There was an error")
 		} else {
@@ -63,6 +64,9 @@ func init() {
 	rootCmd.AddCommand(cmdInitPG)
 	rootCmd.AddCommand(cmdDescribeTable)
 	rootCmd.AddCommand(cmdDescribeColumns)
-	rootCmd.AddCommand(cmdFrequencyCount)
-
+	cmdAnalyze.Flags().StringVarP(&clmn, "colname", "c", "", "column name to be analysed")
+	cmdAnalyze.Flags().StringVarP(&fn, "funcname", "f", "", "function name to be applied")
+	cmdAnalyze.Flags().StringVarP(&tbln, "tablename", "t", "", "name of the table")
+	cmdAnalyze.Flags().IntVarP(&limit, "limit", "l", 1000, "limits the number of records to be analyzed to")
+	rootCmd.AddCommand(cmdAnalyze)
 }

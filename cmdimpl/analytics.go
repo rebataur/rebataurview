@@ -2,11 +2,28 @@ package cmdimpl
 
 import (
 	"fmt"
+	"strings"
 )
 
-func GetFrequencyCount(colName string, tableName string, limit int) []byte {
-	query := fmt.Sprintf("select %s, count(%s) as cnt from %s group by %s order by cnt desc limit %d", colName, colName, tableName, colName, limit)
-	return queryStmt(query)
+func DoAnalytics(clmn, tbln, fn string, limit int, args []string) ([]byte, error) {
+	var lmtStr string
+	if limit > 0 {
+		lmtStr = fmt.Sprintf(" limit %d", limit)
+	}
+	clmns := strings.Split(clmn, ",")
+	firstCol := clmns[0]
+	switch fn {
+	case "freq":
+		{
+			query := fmt.Sprintf("select %s,count(%s) as freq from %s group by %s,product order by freq desc %s", clmn, firstCol, tbln, clmn, lmtStr)
+			return queryStmt(query), nil
+		}
+	default:
+		{
+			return []byte("No analytics function provided"), nil
+		}
+	}
+
 }
 
 func AnalyzeTable(tableName string) {
