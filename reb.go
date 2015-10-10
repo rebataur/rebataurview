@@ -62,7 +62,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 					ioutil.WriteFile(path, file, 0644)
 					// fmt.Fprintf(w, "Done")
 					fmt.Println("Writing to file done")
-					//http.Redirect(w, r, "/static/dojoui/rep.html", http.StatusFound)
+					http.Redirect(w, r, "/app", http.StatusFound)
 					//fmt.Fprintf(w, "File uploaded to repository",http.StatusFound)
 
 				} else {

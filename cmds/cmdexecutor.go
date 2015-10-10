@@ -26,7 +26,7 @@ func init() {
 		cmdimpl.StartPG(config.Database.DBPath)
 		cmdimpl.SetupDB()
 		// Start the Node Window
-		startNW(config.NW.NWPath)
+		//startNW(config.NW.NWPath)
 		initialized = true
 	}
 
