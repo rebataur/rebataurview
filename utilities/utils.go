@@ -15,13 +15,13 @@ type DB struct {
 type NW struct{
 	NWPath string
 }
-type Repository struct{
+type Rep struct{
 	Path string
 }
 type Config struct {
 	Database DB
 	NW NW
-  Rep Repository
+  Repository Rep
 }
 
 func ReadConfig() (Config, error) {

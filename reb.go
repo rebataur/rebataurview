@@ -75,18 +75,23 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		uploadedFilePath = strings.Join([]string{repositoryPath, fileName}, "")
+
+		fmt.Println("PG COPY**************8",uploadedFilePath)
 		cmds.LoadDataIntoPG(uploadedFilePath,true)
 	}
 
 }
 
 func init() {
+		fmt.Println("init")
 	config, err := cmds.GetConfig()
+	fmt.Println("getting config")
 	if err == nil {
 		nwPath = config.NW.NWPath
-		repositoryPath = config.Rep.Path
+		repositoryPath = config.Repository.Path
+		fmt.Println(repositoryPath)
 	} else {
-		log.Fatal("Error getting Connfiguration")
+		log.Fatal("Error getting NW Path")
 	}
 
 }
