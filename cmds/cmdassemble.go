@@ -2,8 +2,8 @@ package cmds
 
 import (
 	// "fmt"
-	"sync"
 	"strings"
+	"sync"
 )
 import (
 	"github.com/spf13/cobra"
@@ -71,7 +71,7 @@ func init() {
 	cmdAnalyze.Flags().IntVarP(&limit, "limit", "l", 1000, "limits the number of records to be analyzed to")
 	rootCmd.AddCommand(cmdAnalyze)
 }
-func SetAndExecuteCmd(cmd string){
+func SetAndExecuteCmd(cmd string) {
 	rootCmd.SetArgs(strings.Split(cmd, " "))
 	rootCmd.Execute()
 }

@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
-	"io/ioutil"
 )
 
 import (
 	"github.com/ranjanprj/rebataurview/cmds"
 )
 
-var nwPath,repositoryPath,uploadedFilePath string
+var nwPath, repositoryPath, uploadedFilePath string
 
 func main() {
 	http.HandleFunc("/", homeHandler)
@@ -36,13 +36,10 @@ func cmdHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
-
 func executeCommand(cmd string) {
 	cmds.SetAndExecuteCmd(cmd)
 
 }
-
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	action := r.FormValue("action")
@@ -58,7 +55,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			f, err := fh.Open()
 			if err == nil {
 				if file, err := ioutil.ReadAll(f); err == nil {
-					path := strings.Join([]string{repositoryPath,fh.Filename}, "")
+					path := strings.Join([]string{repositoryPath, fh.Filename}, "")
 					ioutil.WriteFile(path, file, 0644)
 					// fmt.Fprintf(w, "Done")
 					fmt.Println("Writing to file done")
@@ -66,7 +63,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 					//fmt.Fprintf(w, "File uploaded to repository",http.StatusFound)
 
 				} else {
-					fmt.Fprintf(w, "ERROR IN : File uploaded to repository",http.StatusNotFound)
+					fmt.Fprintf(w, "ERROR IN : File uploaded to repository", http.StatusNotFound)
 					log.Fatal(err)
 				}
 			} else {
@@ -76,14 +73,14 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		uploadedFilePath = strings.Join([]string{repositoryPath, fileName}, "")
 
-		fmt.Println("PG COPY**************8",uploadedFilePath)
-		cmds.LoadDataIntoPG(uploadedFilePath,true)
+		fmt.Println("PG COPY**************8", uploadedFilePath)
+		cmds.LoadDataIntoPG(uploadedFilePath, true)
 	}
 
 }
 
 func init() {
-		fmt.Println("init")
+	fmt.Println("init")
 	config, err := cmds.GetConfig()
 	fmt.Println("getting config")
 	if err == nil {

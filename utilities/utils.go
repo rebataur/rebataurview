@@ -12,16 +12,16 @@ type DB struct {
 	DBType string
 	DBPath string
 }
-type NW struct{
+type NW struct {
 	NWPath string
 }
-type Rep struct{
+type Rep struct {
 	Path string
 }
 type Config struct {
-	Database DB
-	NW NW
-  Repository Rep
+	Database   DB
+	NW         NW
+	Repository Rep
 }
 
 func ReadConfig() (Config, error) {

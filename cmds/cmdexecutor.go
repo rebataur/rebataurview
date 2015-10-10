@@ -23,7 +23,9 @@ func init() {
 		}
 
 		// Start the DB
-		cmdimpl.StartPG(config.Database.DBPath)
+		// fmt.Println(config.Repository.Path,config.Database.DBPath)
+		cmdimpl.CreateRepository(config.Repository.Path,config.Database.DBPath)
+		cmdimpl.StartPG(config.Repository.Path,config.Database.DBPath)
 		cmdimpl.SetupDB()
 		// Start the Node Window
 		//startNW(config.NW.NWPath)
@@ -70,7 +72,7 @@ func LoadDataIntoPG(filePath string, directCopy bool) {
 	// If direct copy then issue the command
 	if directCopy {
 		cmdimpl.PGCopyCmd(tableName, filePath)
-	}else{
+	} else {
 
 	}
 

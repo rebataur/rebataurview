@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -31,11 +32,11 @@ func dbStarted() bool {
 		return true
 	}
 }
-func StartPG(dbPath string) {
+func StartPG(repPath,dbPath string) {
 	log.Println("starting up")
 	if dbStarted() == false {
 		go func() {
-			out, err := exec.Command(strings.Join([]string{dbPath, "App\\PgSQL\\bin\\pg_ctl"}, ""), "start", "-D", strings.Join([]string{dbPath, "Data\\data"}, "")).Output()
+			out, err := exec.Command(strings.Join([]string{dbPath, "App\\PgSQL\\bin\\pg_ctl"}, ""), "start", "-D", strings.Join([]string{repPath, "data"}, "")).Output()
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -62,6 +63,22 @@ func StopPG(dbPath string) {
 	}()
 
 	time.Sleep(10 * time.Second)
+}
+
+func CreateRepository(repPath string, dbPath string) {
+
+	if _, err := os.Stat(repPath); err != nil {
+		if os.IsNotExist(err) {
+			// file does not exist
+			os.MkdirAll(repPath, 0777)
+			//initdb -U postgres -A trust -E utf8 --locale=C
+			_, err := exec.Command(strings.Join([]string{dbPath, "App\\PgSQL\\bin\\initdb"}, ""),"-U","postgres","-E", "utf8", "-D", strings.Join([]string{repPath, "data"}, "")).Output()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+		}
+	}
 }
 func SetupDB() {
 	if db == nil {
