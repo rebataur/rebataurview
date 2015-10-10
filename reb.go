@@ -5,20 +5,26 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"io/ioutil"
 )
 
-var nwPath string
+import (
+	"github.com/ranjanprj/rebataurview/cmds"
+)
+
+var nwPath,repositoryPath,uploadedFilePath string
 
 func main() {
 	http.HandleFunc("/", homeHandler)
 	http.HandleFunc("/cmd", cmdHandler)
+	http.HandleFunc("/upload", uploadHandler)
 	http.Handle("/app/", http.FileServer(http.Dir(nwPath)))
 	http.ListenAndServe(":9999", nil)
 
 }
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-	fmt.Fprintf(w, "Hi there, I love %s!", "hahah")
+	fmt.Fprintf(w, "This is home")
 
 	// executeCommand("initpg D:\\uploads\\cc.csv")
 
@@ -26,21 +32,61 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 func cmdHandler(w http.ResponseWriter, r *http.Request) {
 	cmd := r.FormValue("cmd")
 	executeCommand(cmd)
-	fmt.Fprintf(w, "%s", result)
+	fmt.Fprintf(w, "%s", cmds.Result)
 
 }
 
+
+
 func executeCommand(cmd string) {
-	rootCmd.SetArgs(strings.Split(cmd, " "))
-	rootCmd.Execute()
+	cmds.SetAndExecuteCmd(cmd)
+
+}
+
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	action := r.FormValue("action")
+	if action == "upload" {
+
+		var fileName string
+
+		r.ParseMultipartForm(32 << 20) // 32MB is the default used by FormFile
+		fhs := r.MultipartForm.File["file"]
+		for _, fh := range fhs {
+			fileName = fh.Filename
+
+			f, err := fh.Open()
+			if err == nil {
+				if file, err := ioutil.ReadAll(f); err == nil {
+					path := strings.Join([]string{repositoryPath,fh.Filename}, "")
+					ioutil.WriteFile(path, file, 0644)
+					// fmt.Fprintf(w, "Done")
+					fmt.Println("Writing to file done")
+					//http.Redirect(w, r, "/static/dojoui/rep.html", http.StatusFound)
+					//fmt.Fprintf(w, "File uploaded to repository",http.StatusFound)
+
+				} else {
+					fmt.Fprintf(w, "ERROR IN : File uploaded to repository",http.StatusNotFound)
+					log.Fatal(err)
+				}
+			} else {
+				log.Fatal(err)
+			}
+		}
+
+		uploadedFilePath = strings.Join([]string{repositoryPath, fileName}, "")
+		cmds.LoadDataIntoPG(uploadedFilePath,true)
+	}
+
 }
 
 func init() {
-	config, err := getConfig()
+	config, err := cmds.GetConfig()
 	if err == nil {
 		nwPath = config.NW.NWPath
+		repositoryPath = config.Rep.Path
 	} else {
-		log.Fatal("Error getting NW Path")
+		log.Fatal("Error getting Connfiguration")
 	}
 
 }

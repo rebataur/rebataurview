@@ -1,14 +1,15 @@
-package main
+package cmds
 
 import (
 	// "fmt"
 	"sync"
+	"strings"
 )
 import (
 	"github.com/spf13/cobra"
 )
 
-var result []byte
+var Result []byte
 var mutex = &sync.Mutex{}
 var fn, clmn, tbln string
 var limit int
@@ -20,7 +21,7 @@ var cmdInitPG = &cobra.Command{
       and initialize and start Postgres database.
       `,
 	Run: func(cmd *cobra.Command, args []string) {
-		loadDataIntoPG(args[0], true)
+		LoadDataIntoPG(args[0], true)
 	},
 }
 var cmdDescribeTable = &cobra.Command{
@@ -29,7 +30,7 @@ var cmdDescribeTable = &cobra.Command{
 	Long:  `This describes table`,
 	Run: func(cmd *cobra.Command, args []string) {
 		mutex.Lock()
-		result = describeTable()
+		Result = describeTable()
 		mutex.Unlock()
 	},
 }
@@ -40,7 +41,7 @@ var cmdDescribeColumns = &cobra.Command{
 	Long:  `This describes Columns of table`,
 	Run: func(cmd *cobra.Command, args []string) {
 		mutex.Lock()
-		result = describeColumns(args[0])
+		Result = describeColumns(args[0])
 		mutex.Unlock()
 	},
 }
@@ -52,9 +53,9 @@ var cmdAnalyze = &cobra.Command{
 		mutex.Lock()
 		res, err := doAnalytics(clmn, tbln, fn, limit, args)
 		if err != nil {
-			result = []byte("There was an error")
+			Result = []byte("There was an error")
 		} else {
-			result = res
+			Result = res
 		}
 		mutex.Unlock()
 	},
@@ -69,4 +70,8 @@ func init() {
 	cmdAnalyze.Flags().StringVarP(&tbln, "tablename", "t", "", "name of the table")
 	cmdAnalyze.Flags().IntVarP(&limit, "limit", "l", 1000, "limits the number of records to be analyzed to")
 	rootCmd.AddCommand(cmdAnalyze)
+}
+func SetAndExecuteCmd(cmd string){
+	rootCmd.SetArgs(strings.Split(cmd, " "))
+	rootCmd.Execute()
 }

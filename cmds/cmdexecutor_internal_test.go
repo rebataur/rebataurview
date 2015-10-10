@@ -1,18 +1,22 @@
-package main
+package cmds
 
 import (
 	"log"
 	"testing"
 	// "strings"
+	// "fmt"
 )
 
 import ()
 
 func TestCSVMetaParser(t *testing.T) {
 
-	loadDataIntoPG("D:\\uploads\\minicc.csv", true)
-	loadDataIntoPG("D:\\uploads\\Consumer_Complaints.csv", true)
-	loadDataIntoPG("D:\\uploads\\Major_Contract_Awards.csv", true)
+	LoadDataIntoPG("D:\\uploads\\minicc.csv", true)
+	LoadDataIntoPG("D:\\uploads\\Consumer_Complaints.csv", true)
+	LoadDataIntoPG("D:\\uploads\\Major_Contract_Awards.csv", true)
+	LoadDataIntoPG("D:\\uploads\\banklist.csv", true)
+	LoadDataIntoPG("D:\\uploads\\postscndryunivsrvy2013dirinfo.csv", true)
+	LoadDataIntoPG("D:\\uploads\\investment.csv", true)
 }
 
 func TestGetTableMetaData(t *testing.T) {

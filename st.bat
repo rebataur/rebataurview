@@ -1,2 +1,3 @@
-go build
-rebataurview.exe
+del reb.exe
+go build reb.go
+reb.exe

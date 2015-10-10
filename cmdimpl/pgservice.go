@@ -99,7 +99,7 @@ func PGCreateTable(tableName string, colsType []string) {
 	log.Println("Creating tables")
 	dropTableSQL := fmt.Sprintf("DROP TABLE IF  EXISTS %s; \n", tableName)
 	createTableSQL := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s ( %s ); \n ", tableName, strings.Join(colsType, " ,"))
-
+	log.Println(createTableSQL)
 	execPrepareStmt(dropTableSQL)
 	execPrepareStmt(createTableSQL)
 

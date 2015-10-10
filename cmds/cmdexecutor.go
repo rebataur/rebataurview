@@ -1,4 +1,4 @@
-package main
+package cmds
 
 import (
 	"log"
@@ -39,7 +39,7 @@ func cleanup() {
 	}
 
 }
-func getConfig() (utils.Config, error) {
+func GetConfig() (utils.Config, error) {
 	return utils.ReadConfig()
 
 }
@@ -55,7 +55,7 @@ func startNW(path string) {
 
 	}()
 }
-func loadDataIntoPG(filePath string, directCopy bool) {
+func LoadDataIntoPG(filePath string, directCopy bool) {
 	// Read the CSV metadata
 	tableName, cols, colsType, err := cmdimpl.FindColumnNameAndType(filePath)
 	if err != nil {
@@ -70,6 +70,8 @@ func loadDataIntoPG(filePath string, directCopy bool) {
 	// If direct copy then issue the command
 	if directCopy {
 		cmdimpl.PGCopyCmd(tableName, filePath)
+	}else{
+
 	}
 
 	// Create table metadata

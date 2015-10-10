@@ -109,9 +109,13 @@ func ReadRepositoryFile(fileName, filePath string) []string {
 
 func replaceRegexMatchesForSpecialChars(src, repl string) string {
 	matches := regexp.MustCompile("[`~!@#$%^&*()_+={}|\"';:/?.>,<']")
-	rawStr := matches.ReplaceAllLiteralString(src, repl)
-	removeBlank := strings.Replace(rawStr, " ", "_", -1)
+	rawStr1 := matches.ReplaceAllLiteralString(src, repl)
 
+
+	digitMatches := regexp.MustCompile("[\\d]")
+	rawStr := digitMatches.ReplaceAllLiteralString(rawStr1,repl)
+
+	removeBlank := strings.Replace(rawStr, " ", "_", -1)
 	removeHyphen := strings.Replace(removeBlank, "-", "_", -1)
 	finalStr := strings.ToLower(removeHyphen)
 	return finalStr
@@ -175,14 +179,16 @@ func getCreateTableQuery(columns, colVal []string) (string, []ColumnType) {
 		} else if pctMatches.MatchString(each) {
 			dbCols[i].name = each
 			dbCols[i].dbType = "percentage"
-		}else if isCurr,val := isCurrency(each);isCurr==true{
-			dbCols[i].name = val
-			dbCols[i].dbType = "decimal"
-		}else {
+		}		else {
 			dbCols[i].name = each
 			dbCols[i].dbType = "varchar"
 		}
 
+
+		// else if isCurr,val := isCurrency(each);isCurr==true{
+		// 	dbCols[i].name = val
+		// 	dbCols[i].dbType = "varchar"
+		// }
 	}
 
 	sqlColDef := make([]string, len(columns))

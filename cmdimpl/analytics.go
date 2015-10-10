@@ -15,7 +15,8 @@ func DoAnalytics(clmn, tbln, fn string, limit int, args []string) ([]byte, error
 	switch fn {
 	case "freq":
 		{
-			query := fmt.Sprintf("select %s,count(%s) as freq from %s group by %s,product order by freq desc %s", clmn, firstCol, tbln, clmn, lmtStr)
+			query := fmt.Sprintf("select %s,count(%s) as freq from %s group by %s order by freq desc %s", clmn, firstCol, tbln, clmn, lmtStr)
+			fmt.Println();
 			return queryStmt(query), nil
 		}
 	default:
