@@ -31,13 +31,12 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 func cmdHandler(w http.ResponseWriter, r *http.Request) {
 	cmd := r.FormValue("cmd")
-	executeCommand(cmd)
-	fmt.Fprintf(w, "%s", cmds.Result)
+	fmt.Fprintf(w, "%s", executeCommand(cmd))
 
 }
 
-func executeCommand(cmd string) {
-	cmds.SetAndExecuteCmd(cmd)
+func executeCommand(cmd string) []byte {
+	return cmds.SetAndExecuteCmd(cmd)
 
 }
 
